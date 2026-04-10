@@ -1,5 +1,6 @@
 import sys
 import traceback
+import time
 
 def start():
     try:
@@ -10,10 +11,10 @@ def start():
 
         from os_ken.base.app_manager import AppManager
 
-        print("[*] Loading app: simple_switch_13", flush=True)
+        print("[*] Loading simple_switch_13 ...", flush=True)
 
         app_mgr = AppManager.get_instance()
-        app_mgr.load_apps(["simple_switch_13"])
+        app_mgr.load_apps(["simple_switch_13"])   # pure original — no REST dep
         contexts = app_mgr.create_contexts()
         services = app_mgr.instantiate_apps(**contexts)
 
@@ -26,7 +27,6 @@ def start():
     except Exception as e:
         print(f"[FATAL] {e}", flush=True)
         traceback.print_exc()
-        import time
         time.sleep(3600)
 
 start()

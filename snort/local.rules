@@ -1,3 +1,19 @@
-alert icmp any any -> $HOME_NET any (msg:"ICMP Flood Detected"; threshold:type both, track by_src, count 10, seconds 1; sid:1000001; rev:1;)
-alert tcp any any -> $HOME_NET any (msg:"Port Scan Detected"; flags:S; threshold:type both, track by_src, count 20, seconds 3; sid:1000002; rev:1;)
-alert tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force"; threshold:type both, track by_src, count 5, seconds 60; sid:1000003; rev:1;)
+# ── ICMP ──────────────────────────────────────────────────────────────────────
+# Ping flood: >10 ICMP packets/sec from the same source
+alert icmp any any -> $HOME_NET any (msg:"ICMP Flood Detected"; threshold:type both, track by_src, count 10, seconds 1; sid:1000001; rev:2;)
+
+# ── Port Scanning ─────────────────────────────────────────────────────────────
+# SYN scan: >20 SYN packets in 3 seconds (nmap -sS style)
+alert tcp any any -> $HOME_NET any (msg:"Port Scan Detected"; flags:S; threshold:type both, track by_src, count 20, seconds 3; sid:1000002; rev:2;)
+
+# ── SSH Brute Force ───────────────────────────────────────────────────────────
+# More than 5 new SSH connections per minute from one host
+alert tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force Detected"; flags:S; threshold:type both, track by_src, count 5, seconds 60; sid:1000003; rev:2;)
+
+# ── UDP Flood ─────────────────────────────────────────────────────────────────
+alert udp any any -> $HOME_NET any (msg:"UDP Flood Detected"; threshold:type both, track by_src, count 50, seconds 1; sid:1000004; rev:1;)
+
+# ── Null / FIN / Xmas scans ───────────────────────────────────────────────────
+alert tcp any any -> $HOME_NET any (msg:"NULL Scan Detected"; flags:0; threshold:type both, track by_src, count 5, seconds 3; sid:1000005; rev:1;)
+alert tcp any any -> $HOME_NET any (msg:"FIN Scan Detected"; flags:F; threshold:type both, track by_src, count 5, seconds 3; sid:1000006; rev:1;)
+alert tcp any any -> $HOME_NET any (msg:"Xmas Scan Detected"; flags:FPU; threshold:type both, track by_src, count 5, seconds 3; sid:1000007; rev:1;)

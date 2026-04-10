@@ -4,6 +4,9 @@ networks:
   sdn-net:
     driver: bridge
 
+volumes:
+  block-pipe:    # shared volume for the named pipe between controller and block-agent
+
 services:
 
   controller:
@@ -13,7 +16,8 @@ services:
       - sdn-net
     ports:
       - "6633:6633"
-      - "8080:8080"
+    volumes:
+      - block-pipe:/tmp   # controller creates /tmp/block_pipe here
 
   ovs-switch:
     build: ./ovs
@@ -64,19 +68,19 @@ services:
       - NET_ADMIN
       - NET_RAW
 
-  # block-agent reads snort alerts — now reads from host's /var/log/snort
   block-agent:
     build: ./controller
     container_name: block-agent
     networks:
       - sdn-net
     volumes:
-      - /var/log/snort:/var/log/snort:ro   # mount host snort log dir read-only
+      - /var/log/snort:/var/log/snort:ro   # host snort alerts (read-only)
+      - block-pipe:/tmp                    # shared pipe with controller
+    environment:
+      SNORT_ALERT_FILE: "/var/log/snort/alert"
+      BLOCK_TIMEOUT_SECONDS: "0"
+      WHITELIST_IPS: ""
     command: ["python", "/app/block_agent.py"]
     depends_on:
       - controller
-
-# NOTE: snort service removed entirely.
-# Snort now runs on the HOST, managed by run.sh.
-# To stop Snort:  sudo pkill -f 'snort -i snort0'
-# Alert log:      sudo tail -f /var/log/snort/alert
+    restart: unless-stopped

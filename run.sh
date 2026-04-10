@@ -44,6 +44,10 @@ sleep 1
 # ─────────────────────────────────────────────
 log "Bringing down existing containers..."
 docker compose down 2>/dev/null || true
+# Remove any leftover named containers that conflict
+for name in attacker os-ken-ctrl ovs-switch block-agent node1 node2 node3; do
+    docker rm -f "$name" 2>/dev/null || true
+done
 
 # ─────────────────────────────────────────────
 # STEP 3: Clean up leftover veth interfaces
