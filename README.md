@@ -14,28 +14,9 @@ os-ken-ctrl (container)
 OVS switch (container)
     ↓  drops all packets from attacker at wire speed (priority=200)
 ```
-┌─────────────────────────────────────────────────────────┐
-│                        HOST                             │
-│   Snort ──► /var/log/snort/alert                        │
-│   snort0 (mirror interface) ◄── OVS mirror              │
-└─────────────────────────────────────────────────────────┘
-│ bind mount
-┌────────▼────────────────────────────────────────────────┐
-│                   Docker Network (sdn-net)               │
-│                                                          │
-│  ┌─────────────┐    pipe    ┌──────────────┐            │
-│  │ block-agent │ ─────────► │ os-ken-ctrl  │            │
-│  └─────────────┘  /tmp/     │ (OpenFlow)   │            │
-│                   block_pipe└──────┬───────┘            │
-│                                    │ OF1.3              │
-│  ┌─────────────────────────────────▼──────────────┐     │
-│  │              OVS Switch (br0)                   │     │
-│  │  veth1-br  veth2-br  veth3-br  veth4-br        │     │
-│  └────┬────────────┬───────────┬──────────┬────────┘     │
-│       │            │           │          │              │
-│   node1        node2       node3      attacker          │
-│  10.0.0.1    10.0.0.2    10.0.0.3    10.0.0.4          │
-└─────────────────────────────────────────────────────────┘
+## Architecture
+
+![SDN Architecture](architecture.svg)
 
 ## Flow Priority Ladder
 
