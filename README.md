@@ -16,7 +16,7 @@ OVS switch (container)
 ```
 ## Architecture
 
-![SDN Architecture](architecture.svg)
+![SDN Architecture](architecture.png)
 
 ## Flow Priority Ladder
 
